@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct ProductivityAppApp: App {
@@ -15,5 +16,6 @@ struct ProductivityAppApp: App {
                 .frame(minWidth: 1000, minHeight: 600)
         }
         .windowStyle(.automatic)
+        .modelContainer(for: TaskItem.self)
     }
 }
