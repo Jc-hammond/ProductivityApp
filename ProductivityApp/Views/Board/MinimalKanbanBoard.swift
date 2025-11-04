@@ -3,6 +3,7 @@
 //  ProductivityApp
 //
 //  Created on 2025-11-03.
+//  Enhanced with Design System
 //
 
 import SwiftUI
@@ -37,31 +38,39 @@ struct MinimalKanbanBoard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 32) {
-            // Week indicator
-            HStack(spacing: 6) {
+        VStack(alignment: .leading, spacing: AppSpacing.xxl) {
+            // Week indicator - more prominent
+            HStack(spacing: AppSpacing.sm) {
                 Circle()
-                    .fill(Color.blue)
-                    .frame(width: 6, height: 6)
+                    .fill(AppColors.Status.inProgress)
+                    .frame(width: 8, height: 8)
                 Text(thisWeekText)
-                    .font(.system(size: 13))
-                    .foregroundStyle(.secondary)
+                    .font(AppTypography.calloutEmphasis)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
 
             if tasks.isEmpty {
-                VStack(spacing: 16) {
-                    Text("No tasks pinned to board")
-                        .font(.system(size: 15))
-                        .foregroundStyle(.secondary)
-                    Text("Pin tasks from your inbox to add them here")
-                        .font(.system(size: 13))
-                        .foregroundStyle(.tertiary)
+                VStack(spacing: AppSpacing.lg) {
+                    Image(systemName: "rectangle.3.group")
+                        .font(.system(size: 48))
+                        .foregroundStyle(AppColors.Text.tertiary)
+                        .symbolEffect(.pulse)
+
+                    VStack(spacing: AppSpacing.sm) {
+                        Text("No tasks pinned to board")
+                            .font(AppTypography.subheadline)
+                            .foregroundStyle(AppColors.Text.secondary)
+                        Text("Pin tasks from your inbox to organize them here")
+                            .font(AppTypography.callout)
+                            .foregroundStyle(AppColors.Text.tertiary)
+                            .multilineTextAlignment(.center)
+                    }
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 48)
+                .padding(.vertical, AppSpacing.massive)
             } else {
-                // Three minimal columns
-                HStack(alignment: .top, spacing: 24) {
+                // Three columns with better spacing
+                HStack(alignment: .top, spacing: AppSpacing.lg) {
                     ForEach(TaskStatus.allCases) { status in
                         MinimalKanbanColumn(
                             status: status,

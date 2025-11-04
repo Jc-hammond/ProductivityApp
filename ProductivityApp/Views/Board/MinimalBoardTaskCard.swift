@@ -3,6 +3,7 @@
 //  ProductivityApp
 //
 //  Created on 2025-11-03.
+//  Enhanced with Design System
 //
 
 import SwiftUI
@@ -23,66 +24,81 @@ struct MinimalBoardTaskCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Title with repeat icon
-            HStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            // Title with repeat icon - enhanced
+            HStack(spacing: AppSpacing.xs) {
                 if task.recurrence != .none {
                     Image(systemName: "repeat")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.tertiary)
+                        .font(AppTypography.footnote)
+                        .foregroundStyle(AppColors.Text.tertiary)
                 }
                 Text(task.title)
-                    .font(.system(size: 14))
-                    .foregroundStyle(.primary)
+                    .font(AppTypography.body)
+                    .foregroundStyle(AppColors.Text.primary)
             }
 
             // Details (if any)
             if !task.details.isEmpty {
                 Text(task.details)
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .lineLimit(2)
             }
 
-            // Subtle metadata
+            // Refined metadata badges
             if hasMetadata {
-                HStack(spacing: 8) {
+                HStack(spacing: AppSpacing.xs) {
                     if let due = task.dueDate {
-                        HStack(spacing: 3) {
+                        HStack(spacing: AppSpacing.xs) {
                             Image(systemName: "calendar")
-                                .font(.system(size: 10))
+                                .font(AppTypography.footnote)
                             Text(due.formatted(date: .abbreviated, time: .omitted))
-                                .font(.system(size: 11))
+                                .font(AppTypography.footnote)
                         }
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppColors.Text.secondary)
+                        .padding(.horizontal, AppSpacing.xs)
+                        .padding(.vertical, 2)
+                        .background(
+                            Capsule()
+                                .fill(AppColors.Surface.tertiary)
+                        )
                     }
                     if task.link != nil {
                         Image(systemName: "link")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.secondary)
+                            .font(AppTypography.footnote)
+                            .foregroundStyle(AppColors.Text.secondary)
+                            .padding(AppSpacing.xs)
+                            .background(
+                                Circle()
+                                    .fill(AppColors.Surface.tertiary)
+                            )
                     }
                     if !task.tags.isEmpty {
-                        ForEach(task.tags.prefix(2), id: \.self) { tag in
+                        ForEach(task.tags.prefix(1), id: \.self) { tag in
                             Text("#\(tag)")
-                                .font(.system(size: 10))
-                                .foregroundStyle(.tertiary)
+                                .font(AppTypography.footnoteEmphasis)
+                                .foregroundStyle(AppColors.Text.tertiary)
+                        }
+                        if task.tags.count > 1 {
+                            Text("+\(task.tags.count - 1)")
+                                .font(AppTypography.footnoteEmphasis)
+                                .foregroundStyle(AppColors.Text.tertiary)
                         }
                     }
                 }
             }
 
-            // Action buttons (show on hover only)
-            // Fixed height container to prevent layout shift
-            HStack(spacing: 8) {
+            // Action buttons (show on hover only) - refined
+            HStack(spacing: AppSpacing.xs) {
                 if isHovering {
                     if let next = task.status.nextStep {
                         Button("→ \(next.title)") { updateStatus(next) }
-                            .font(.system(size: 11))
+                            .font(AppTypography.footnoteEmphasis)
                     }
                     Button("Edit") { editTask() }
-                        .font(.system(size: 11))
+                        .font(AppTypography.footnoteEmphasis)
                     Button("Unpin") { toggleBoard() }
-                        .font(.system(size: 11))
+                        .font(AppTypography.footnoteEmphasis)
                 }
             }
             .buttonStyle(.plain)
@@ -90,19 +106,26 @@ struct MinimalBoardTaskCard: View {
             .frame(height: isHovering ? nil : 0)
             .clipped()
             .opacity(isHovering ? 1 : 0)
-            .animation(AppAnimation.quick, value: isHovering)
+            .animation(AppAnimation.fadeIn, value: isHovering)
         }
-        .padding(12)
+        .padding(AppSpacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(isHovering ? Color.primary.opacity(0.03) : Color(nsColor: .controlBackgroundColor))
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+                .fill(isHovering ? AppColors.Surface.cardHover : AppColors.Surface.card)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.06), lineWidth: 1)
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+                .strokeBorder(isHovering ? AppColors.Border.medium : AppColors.Border.subtle, lineWidth: 1)
         )
-        .animation(AppAnimation.quick, value: isHovering)
+        .shadow(
+            color: isHovering ? AppShadow.cardHover.color.opacity(0.5) : Color.clear,
+            radius: isHovering ? 8 : 0,
+            x: 0,
+            y: isHovering ? 4 : 0
+        )
+        .scaleEffect(isHovering ? 1.02 : 1.0)
+        .animation(AppAnimation.springQuick, value: isHovering)
         .onHover { hovering in
             isHovering = hovering
         }

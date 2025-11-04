@@ -3,6 +3,7 @@
 //  ProductivityApp
 //
 //  Created on 2025-11-03.
+//  Enhanced with Design System
 //
 
 import SwiftUI
@@ -21,9 +22,17 @@ struct MinimalKanbanColumn: View {
 
     private var statusColor: Color {
         switch status {
-        case .todo: return .gray
-        case .inProgress: return .blue
-        case .done: return .green
+        case .todo: return AppColors.Status.todo
+        case .inProgress: return AppColors.Status.inProgress
+        case .done: return AppColors.Status.done
+        }
+    }
+
+    private var columnBackground: Color {
+        switch status {
+        case .todo: return AppColors.Status.todoSubtle.opacity(0.3)
+        case .inProgress: return AppColors.Status.inProgressSubtle.opacity(0.3)
+        case .done: return AppColors.Status.doneSubtle.opacity(0.3)
         }
     }
 
@@ -41,30 +50,46 @@ struct MinimalKanbanColumn: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Column header with dot
-            HStack(spacing: 8) {
-                Circle()
-                    .fill(statusColor)
-                    .frame(width: 8, height: 8)
-                Text(status.title)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.secondary)
-                Text("\(tasks.count)")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.tertiary)
+        VStack(alignment: .leading, spacing: AppSpacing.lg) {
+            // Column header - more prominent
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                HStack(spacing: AppSpacing.sm) {
+                    Circle()
+                        .fill(statusColor)
+                        .frame(width: 10, height: 10)
+                    Text(status.title)
+                        .font(AppTypography.subheadline)
+                        .foregroundStyle(AppColors.Text.primary)
+                    Spacer()
+                    Text("\(tasks.count)")
+                        .font(AppTypography.captionEmphasis)
+                        .foregroundStyle(AppColors.Text.tertiary)
+                        .padding(.horizontal, AppSpacing.sm)
+                        .padding(.vertical, AppSpacing.xs)
+                        .background(
+                            Capsule()
+                                .fill(AppColors.Surface.tertiary)
+                        )
+                }
+
+                Divider()
+                    .background(statusColor.opacity(0.2))
             }
-            .padding(.bottom, 4)
 
             // Tasks in column
             if tasks.isEmpty {
-                Text("No tasks")
-                    .font(.system(size: 13))
-                    .foregroundStyle(.tertiary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 24)
+                VStack(spacing: AppSpacing.sm) {
+                    Image(systemName: "tray")
+                        .font(.system(size: 32))
+                        .foregroundStyle(AppColors.Text.tertiary)
+                    Text("No tasks")
+                        .font(AppTypography.callout)
+                        .foregroundStyle(AppColors.Text.tertiary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, AppSpacing.xxxl)
             } else {
-                VStack(spacing: 4) {
+                VStack(spacing: AppSpacing.sm) {
                     ForEach(sortedTasks) { task in
                         MinimalBoardTaskCard(
                             task: task,
@@ -80,20 +105,29 @@ struct MinimalKanbanColumn: View {
                         .transition(.scale.combined(with: .opacity))
                     }
                 }
-                .animation(AppAnimation.standard, value: sortedTasks.map { $0.id })
+                .animation(AppAnimation.springStandard, value: sortedTasks.map { $0.id })
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
+        .padding(AppSpacing.lg)
         .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(isTargeted ? statusColor.opacity(0.08) : Color.clear)
+            RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
+                .fill(isTargeted ? statusColor.opacity(0.12) : columnBackground)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(isTargeted ? statusColor.opacity(0.3) : Color.clear, lineWidth: 2)
+            RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
+                .strokeBorder(
+                    isTargeted ? statusColor.opacity(0.4) : statusColor.opacity(0.15),
+                    lineWidth: isTargeted ? 2 : 1
+                )
         )
-        .animation(AppAnimation.standard, value: isTargeted)
+        .shadow(
+            color: isTargeted ? statusColor.opacity(0.2) : AppShadow.card.color,
+            radius: isTargeted ? 12 : AppShadow.card.radius,
+            x: 0,
+            y: isTargeted ? 6 : AppShadow.card.y
+        )
+        .animation(AppAnimation.springQuick, value: isTargeted)
         .dropDestination(for: String.self) { items, _ in
             guard let idString = items.first,
                   let uuid = UUID(uuidString: idString),

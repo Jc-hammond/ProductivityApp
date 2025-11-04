@@ -38,67 +38,83 @@ struct ContentView: View {
         NavigationStack {
             ScrollView {
                 leftColumn
-                    .frame(maxWidth: 720)
-                    .padding(.horizontal, 40)
-                    .padding(.vertical, 48)
+                    .frame(maxWidth: 760)
+                    .padding(.horizontal, AppSpacing.huge)
+                    .padding(.vertical, AppSpacing.massive)
             }
             .frame(maxWidth: .infinity)
-            .background(Color(nsColor: .windowBackgroundColor))
+            .background(AppColors.Surface.primary)
             .navigationTitle("")
             .searchable(text: $searchText, prompt: "Search tasks")
             .overlay(alignment: .bottom) {
                 VStack(spacing: 12) {
                     // Undo toast (higher priority)
                     if let undo = undoToast {
-                        HStack(spacing: 12) {
+                        HStack(spacing: AppSpacing.md) {
                             Text(undo)
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(.primary)
+                                .font(AppTypography.bodyEmphasis)
+                                .foregroundStyle(AppColors.Text.primary)
 
                             Button(action: {
                                 undoManager?.undo()
                                 undoToast = nil
                             }) {
                                 Text("Undo")
-                                    .font(.system(size: 14, weight: .semibold))
+                                    .font(AppTypography.bodyEmphasis)
                                     .foregroundStyle(.blue)
                             }
                             .buttonStyle(.plain)
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
+                        .padding(.horizontal, AppSpacing.xl)
+                        .padding(.vertical, AppSpacing.md)
                         .background(
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(Color(nsColor: .controlBackgroundColor))
-                                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 4)
+                            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                                .fill(AppColors.Surface.card)
+                                .shadow(
+                                    color: AppShadow.elevated.color,
+                                    radius: AppShadow.elevated.radius,
+                                    x: AppShadow.elevated.x,
+                                    y: AppShadow.elevated.y
+                                )
                         )
                         .overlay(
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .strokeBorder(Color.primary.opacity(0.1), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                                .strokeBorder(AppColors.Border.medium, lineWidth: 1)
                         )
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .zIndex(101)
                     }
 
-                    // Completion celebration
+                    // Completion celebration - more impactful
                     if let completion = completionFeedback {
                         Text(completion)
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(AppTypography.subheadline)
                             .foregroundStyle(.white)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 12)
+                            .padding(.horizontal, AppSpacing.xxl)
+                            .padding(.vertical, AppSpacing.lg)
                             .background(
                                 Capsule()
-                                    .fill(Color.green.gradient)
-                                    .shadow(color: Color.green.opacity(0.3), radius: 8, x: 0, y: 4)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [AppColors.Success.fill, AppColors.Success.fill.opacity(0.8)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .shadow(
+                                        color: AppColors.Success.fill.opacity(0.4),
+                                        radius: 16,
+                                        x: 0,
+                                        y: 8
+                                    )
                             )
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                            .transition(.scale(scale: 0.8).combined(with: .move(edge: .bottom)).combined(with: .opacity))
                             .zIndex(100)
                     }
                 }
-                .padding(.bottom, 32)
+                .padding(.bottom, AppSpacing.xxxl)
             }
-            .animation(AppAnimation.springStandard, value: completionFeedback)
+            .animation(AppAnimation.springBouncy, value: completionFeedback)
             .animation(AppAnimation.springStandard, value: undoToast)
             .toolbar {
                 ToolbarItem(placement: .navigation) {
@@ -106,22 +122,23 @@ struct ContentView: View {
                         Button(action: {
                             selectedView = .today
                         }) {
-                            HStack(spacing: 6) {
+                            HStack(spacing: AppSpacing.xs) {
                                 Image(systemName: "exclamationmark.circle.fill")
-                                    .foregroundStyle(.red)
+                                    .font(AppTypography.callout)
+                                    .foregroundStyle(AppColors.Status.overdue)
                                 Text("\(overdueCount) overdue")
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundStyle(.red)
+                                    .font(AppTypography.calloutEmphasis)
+                                    .foregroundStyle(AppColors.Status.overdue)
                             }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
+                            .padding(.horizontal, AppSpacing.md)
+                            .padding(.vertical, AppSpacing.xs)
                             .background(
                                 Capsule()
-                                    .fill(Color.red.opacity(0.12))
+                                    .fill(AppColors.Status.overdueSubtle)
                             )
                             .overlay(
                                 Capsule()
-                                    .strokeBorder(Color.red.opacity(0.3), lineWidth: 1)
+                                    .strokeBorder(AppColors.Status.overdue.opacity(0.3), lineWidth: 1)
                             )
                         }
                         .buttonStyle(.plain)
@@ -189,20 +206,27 @@ struct ContentView: View {
     }
 
     private var pageHeader: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            HStack(spacing: 16) {
-                // Minimal view switcher
-                HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: AppSpacing.xxl) {
+            HStack(spacing: AppSpacing.lg) {
+                // Enhanced view switcher
+                HStack(spacing: AppSpacing.sm) {
                     ForEach(ViewType.allCases, id: \.self) { viewType in
                         Button(action: { selectedView = viewType }) {
                             Text(viewType.rawValue)
-                                .font(.system(size: 15, weight: selectedView == viewType ? .semibold : .regular))
-                                .foregroundStyle(selectedView == viewType ? .primary : .secondary)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
+                                .font(selectedView == viewType ? AppTypography.bodyEmphasis : AppTypography.body)
+                                .foregroundStyle(selectedView == viewType ? AppColors.Text.primary : AppColors.Text.secondary)
+                                .padding(.horizontal, AppSpacing.lg)
+                                .padding(.vertical, AppSpacing.sm)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                        .fill(selectedView == viewType ? Color.primary.opacity(0.08) : Color.clear)
+                                    RoundedRectangle(cornerRadius: AppRadius.sm, style: .continuous)
+                                        .fill(selectedView == viewType ? AppColors.Surface.cardSelected : Color.clear)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: AppRadius.sm, style: .continuous)
+                                        .strokeBorder(
+                                            selectedView == viewType ? AppColors.Border.medium : Color.clear,
+                                            lineWidth: 1
+                                        )
                                 )
                                 .animation(AppAnimation.quick, value: selectedView == viewType)
                         }
@@ -212,35 +236,35 @@ struct ContentView: View {
 
                 Spacer()
 
-                // Task count
+                // Enhanced task count badges
                 if selectedView == .today && todayTasks.count > 0 {
-                    HStack(spacing: 6) {
+                    HStack(spacing: AppSpacing.sm) {
                         if overdueCount > 0 {
                             Text("\(overdueCount) overdue")
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundStyle(.red)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
+                                .font(AppTypography.calloutEmphasis)
+                                .foregroundStyle(AppColors.Status.overdue)
+                                .padding(.horizontal, AppSpacing.md)
+                                .padding(.vertical, AppSpacing.xs)
                                 .background(
                                     Capsule()
-                                        .fill(Color.red.opacity(0.1))
+                                        .fill(AppColors.Status.overdueSubtle)
                                 )
                         }
                         Text("\(todayTasks.count) task\(todayTasks.count == 1 ? "" : "s") due")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
+                            .font(AppTypography.callout)
+                            .foregroundStyle(AppColors.Text.secondary)
                     }
                 } else if selectedView == .inbox && tasks.count > 0 {
-                    HStack(spacing: 6) {
+                    HStack(spacing: AppSpacing.sm) {
                         Text("\(tasks.filter { $0.status == .done }.count) of \(tasks.count) completed")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
+                            .font(AppTypography.callout)
+                            .foregroundStyle(AppColors.Text.secondary)
                     }
                 } else if selectedView == .board && boardTasks.count > 0 {
-                    HStack(spacing: 6) {
+                    HStack(spacing: AppSpacing.sm) {
                         Text("This week: \(boardTasks.count) tasks")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
+                            .font(AppTypography.callout)
+                            .foregroundStyle(AppColors.Text.secondary)
                     }
                 }
             }
@@ -248,7 +272,7 @@ struct ContentView: View {
     }
 
     private var leftColumn: some View {
-        VStack(alignment: .leading, spacing: 48) {
+        VStack(alignment: .leading, spacing: AppSpacing.huge) {
             pageHeader
 
             if selectedView == .today {
@@ -262,11 +286,11 @@ struct ContentView: View {
                     .transition(.opacity.combined(with: .move(edge: .trailing)))
             }
         }
-        .animation(AppAnimation.standard, value: selectedView)
+        .animation(AppAnimation.springGentle, value: selectedView)
     }
 
     private var inboxView: some View {
-        VStack(alignment: .leading, spacing: 48) {
+        VStack(alignment: .leading, spacing: AppSpacing.huge) {
             TaskCaptureCard(quickEntryTitle: $quickEntryTitle,
                             captureText: $captureText,
                             captureStatus: $captureStatus,
@@ -296,7 +320,7 @@ struct ContentView: View {
     }
 
     private var todayView: some View {
-        VStack(alignment: .leading, spacing: 48) {
+        VStack(alignment: .leading, spacing: AppSpacing.huge) {
             TaskCaptureCard(quickEntryTitle: $quickEntryTitle,
                             captureText: $captureText,
                             captureStatus: $captureStatus,
@@ -318,7 +342,7 @@ struct ContentView: View {
     }
 
     private var boardView: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: AppSpacing.xxxl) {
             // Weekly recurring tasks view
             if hasRecurringTasks {
                 RecurringTasksWeekView(

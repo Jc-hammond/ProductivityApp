@@ -3,6 +3,7 @@
 //  ProductivityApp
 //
 //  Created on 2025-11-03.
+//  Enhanced with Design System
 //
 
 import SwiftUI
@@ -22,23 +23,23 @@ struct TaskComposerSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 32) {
-                    // Main input field
-                    VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: AppSpacing.xxxl) {
+                    // Main input field - larger and more prominent
+                    VStack(alignment: .leading, spacing: AppSpacing.lg) {
                         ZStack(alignment: .topLeading) {
                             if inputText.isEmpty {
                                 Text("What needs to be done?")
-                                    .font(.system(size: 18, weight: .medium))
-                                    .foregroundStyle(.tertiary)
-                                    .padding(.top, 8)
-                                    .padding(.leading, 4)
+                                    .font(AppTypography.composerInput)
+                                    .foregroundStyle(AppColors.Text.placeholder)
+                                    .padding(.top, AppSpacing.sm)
+                                    .padding(.leading, AppSpacing.xs)
                             }
 
                             TextEditor(text: $inputText)
-                                .font(.system(size: 18, weight: .medium))
-                                .foregroundStyle(.primary)
+                                .font(AppTypography.composerInput)
+                                .foregroundStyle(AppColors.Text.primary)
                                 .scrollContentBackground(.hidden)
-                                .frame(minHeight: 80, maxHeight: 120)
+                                .frame(minHeight: 100, maxHeight: 140)
                                 .focused($isInputFocused)
                                 .onChange(of: inputText) { _, newValue in
                                     parsedData = NaturalLanguageTaskParser.parse(newValue)
@@ -46,10 +47,10 @@ struct TaskComposerSheet: View {
                                 }
                         }
 
-                        // Preview chips with smooth animation
+                        // Preview chips with smooth animation - more refined
                         if let parsed = parsedData, hasAnyParsedData(parsed) {
                             ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 8) {
+                                HStack(spacing: AppSpacing.sm) {
                                     if let dateText = parsed.detectedDateText {
                                         PreviewChip(icon: "calendar", text: dateText)
                                             .transition(.scale.combined(with: .opacity))
@@ -68,41 +69,43 @@ struct TaskComposerSheet: View {
                                     }
                                 }
                             }
-                            .animation(AppAnimation.quick, value: parsed.detectedDateText)
-                            .animation(AppAnimation.quick, value: parsed.recurrence)
-                            .animation(AppAnimation.quick, value: parsed.tags)
-                            .animation(AppAnimation.quick, value: parsed.link)
+                            .animation(AppAnimation.springQuick, value: parsed.detectedDateText)
+                            .animation(AppAnimation.springQuick, value: parsed.recurrence)
+                            .animation(AppAnimation.springQuick, value: parsed.tags)
+                            .animation(AppAnimation.springQuick, value: parsed.link)
                         }
                     }
 
                     Divider()
+                        .background(AppColors.Border.divider)
 
-                    // Notes
-                    VStack(alignment: .leading, spacing: 8) {
+                    // Notes - refined
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Text("Notes")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
+                            .font(AppTypography.calloutEmphasis)
+                            .foregroundStyle(AppColors.Text.secondary)
                         TextEditor(text: $draft.details)
-                            .font(.system(size: 15))
+                            .font(AppTypography.body)
+                            .foregroundStyle(AppColors.Text.primary)
                             .scrollContentBackground(.hidden)
-                            .frame(height: 80)
-                            .padding(12)
+                            .frame(height: 100)
+                            .padding(AppSpacing.md)
                             .background(
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .fill(Color(nsColor: .controlBackgroundColor))
+                                RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+                                    .fill(AppColors.Surface.secondary)
                             )
                             .overlay(
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .strokeBorder(Color(nsColor: .separatorColor), lineWidth: 1)
+                                RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+                                    .strokeBorder(AppColors.Border.subtle, lineWidth: 1)
                             )
                     }
 
-                    // Due Date
-                    VStack(alignment: .leading, spacing: 8) {
+                    // Due Date - refined
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Text("Due Date")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
-                        HStack {
+                            .font(AppTypography.calloutEmphasis)
+                            .foregroundStyle(AppColors.Text.secondary)
+                        HStack(spacing: AppSpacing.md) {
                             Toggle("", isOn: $draft.hasDueDate)
                                 .labelsHidden()
                             if draft.hasDueDate {
@@ -111,20 +114,21 @@ struct TaskComposerSheet: View {
                                     .transition(.scale.combined(with: .opacity))
                             } else {
                                 Text("No due date")
-                                    .foregroundStyle(.secondary)
+                                    .font(AppTypography.body)
+                                    .foregroundStyle(AppColors.Text.tertiary)
                                     .transition(.opacity)
                             }
                             Spacer()
                         }
-                        .animation(AppAnimation.quick, value: draft.hasDueDate)
+                        .animation(AppAnimation.springQuick, value: draft.hasDueDate)
                     }
 
-                    // Scheduled Date
-                    VStack(alignment: .leading, spacing: 8) {
+                    // Scheduled Date - refined
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Text("Schedule for")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
-                        HStack {
+                            .font(AppTypography.calloutEmphasis)
+                            .foregroundStyle(AppColors.Text.secondary)
+                        HStack(spacing: AppSpacing.md) {
                             Toggle("", isOn: $draft.hasScheduledDate)
                                 .labelsHidden()
                             if draft.hasScheduledDate {
@@ -133,19 +137,20 @@ struct TaskComposerSheet: View {
                                     .transition(.scale.combined(with: .opacity))
                             } else {
                                 Text("Not scheduled")
-                                    .foregroundStyle(.secondary)
+                                    .font(AppTypography.body)
+                                    .foregroundStyle(AppColors.Text.tertiary)
                                     .transition(.opacity)
                             }
                             Spacer()
                         }
-                        .animation(AppAnimation.quick, value: draft.hasScheduledDate)
+                        .animation(AppAnimation.springQuick, value: draft.hasScheduledDate)
                     }
 
-                    // Repeat
-                    VStack(alignment: .leading, spacing: 8) {
+                    // Repeat - refined
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Text("Repeat")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
+                            .font(AppTypography.calloutEmphasis)
+                            .foregroundStyle(AppColors.Text.secondary)
                         Picker("Repeat", selection: $draft.recurrence) {
                             ForEach(TaskRecurrencePattern.allCases) { pattern in
                                 Text(pattern.rawValue).tag(pattern)
@@ -155,12 +160,12 @@ struct TaskComposerSheet: View {
                         .labelsHidden()
                     }
 
-                    // Day of Week (only shown if recurring)
+                    // Day of Week (only shown if recurring) - refined
                     if draft.recurrence != .none {
-                        VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Text("Day of Week")
-                                .font(.system(size: 13))
-                                .foregroundStyle(.secondary)
+                                .font(AppTypography.calloutEmphasis)
+                                .foregroundStyle(AppColors.Text.secondary)
                             Picker("Day of Week", selection: Binding(
                                 get: { draft.dayOfWeek ?? 1 },
                                 set: { draft.dayOfWeek = $0 }
@@ -179,11 +184,11 @@ struct TaskComposerSheet: View {
                         .transition(.opacity.combined(with: .move(edge: .top)))
                     }
 
-                    // Status
-                    VStack(alignment: .leading, spacing: 8) {
+                    // Status - refined
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Text("Status")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
+                            .font(AppTypography.calloutEmphasis)
+                            .foregroundStyle(AppColors.Text.secondary)
                         Picker("Status", selection: $draft.status) {
                             ForEach(TaskStatus.allCases) { status in
                                 Text(status.title).tag(status)
@@ -193,27 +198,29 @@ struct TaskComposerSheet: View {
                         .labelsHidden()
                     }
                 }
-                .padding(32)
+                .padding(AppSpacing.xxxl)
             }
-            .background(Color(nsColor: .windowBackgroundColor))
+            .background(AppColors.Surface.primary)
             .navigationTitle(isEditing ? "Edit Task" : "New Task")
-//            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         onCancel()
                     }
+                    .font(AppTypography.body)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         onSave()
                     }
+                    .font(AppTypography.bodyEmphasis)
                     .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .keyboardShortcut(.return)
-                    .animation(AppAnimation.quick, value: inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .animation(AppAnimation.springQuick, value: inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
         }
+        .frame(minWidth: 600, minHeight: 700)
         .onAppear {
             isInputFocused = true
             if isEditing {
