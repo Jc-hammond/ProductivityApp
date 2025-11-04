@@ -3,9 +3,14 @@
 //  ProductivityApp
 //
 //  Design System - The foundation of visual excellence
+//  Platform-aware: Adapts to macOS, iOS, and iPadOS
 //
 
 import SwiftUI
+
+#if os(iOS)
+import UIKit
+#endif
 
 // MARK: - Colors
 
@@ -79,6 +84,8 @@ enum AppColors {
 enum AppTypography {
     // MARK: Font Styles
 
+    #if os(macOS)
+    // macOS uses fixed sizes for precision
     /// Large page titles - 28pt, bold
     static let largeTitle = Font.system(size: 28, weight: .bold)
 
@@ -117,7 +124,61 @@ enum AppTypography {
 
     /// Extra large composer input - 20pt, medium
     static let composerInput = Font.system(size: 20, weight: .medium)
+
+    #else
+    // iOS uses Dynamic Type for accessibility
+    /// Large page titles (supports Dynamic Type)
+    static let largeTitle = Font.largeTitle.weight(.bold)
+
+    /// Page titles (supports Dynamic Type)
+    static let title = Font.title.weight(.semibold)
+
+    /// Section headers (supports Dynamic Type)
+    static let headline = Font.headline.weight(.semibold)
+
+    /// Prominent text (supports Dynamic Type)
+    static let subheadline = Font.subheadline.weight(.medium)
+
+    /// Body text (supports Dynamic Type)
+    static let body = Font.body
+
+    /// Body text emphasized (supports Dynamic Type)
+    static let bodyEmphasis = Font.body.weight(.medium)
+
+    /// Secondary text (supports Dynamic Type)
+    static let callout = Font.callout
+
+    /// Secondary text emphasized (supports Dynamic Type)
+    static let calloutEmphasis = Font.callout.weight(.medium)
+
+    /// Small labels (supports Dynamic Type)
+    static let caption = Font.caption
+
+    /// Small labels emphasized (supports Dynamic Type)
+    static let captionEmphasis = Font.caption.weight(.medium)
+
+    /// Tiny text (supports Dynamic Type)
+    static let footnote = Font.footnote
+
+    /// Tiny text emphasized (supports Dynamic Type)
+    static let footnoteEmphasis = Font.footnote.weight(.medium)
+
+    /// Extra large composer input (supports Dynamic Type)
+    static let composerInput = Font.title2.weight(.medium)
+    #endif
 }
+
+#if os(iOS)
+// MARK: - iOS Touch Targets
+
+enum AppTouchTarget {
+    /// Apple's minimum touch target (44pt)
+    static let minimum: CGFloat = 44
+
+    /// Comfortable touch target for thumbs (48pt)
+    static let comfortable: CGFloat = 48
+}
+#endif
 
 // MARK: - Spacing
 
@@ -143,11 +204,19 @@ enum AppSpacing {
     /// 32pt - Large section gaps
     static let xxxl: CGFloat = 32
 
-    /// 48pt - Page margins
+    #if os(macOS)
+    /// 48pt - Page margins (Mac)
     static let huge: CGFloat = 48
 
-    /// 64pt - Extra large spacing
+    /// 64pt - Extra large spacing (Mac)
     static let massive: CGFloat = 64
+    #else
+    /// 32pt - Page margins (iOS - more compact)
+    static let huge: CGFloat = 32
+
+    /// 48pt - Extra large spacing (iOS - more compact)
+    static let massive: CGFloat = 48
+    #endif
 }
 
 // MARK: - Corner Radius
